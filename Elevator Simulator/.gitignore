@@ -1,0 +1,3 @@
+# Ignore local VS Code Java launch/settings files
+.vscode/launch.json
+.vscode/settings.json
