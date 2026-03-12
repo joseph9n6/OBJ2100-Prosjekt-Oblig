@@ -12,7 +12,7 @@ public class App extends Application {
 
         // Laster FXML fra /resources/fxml/Main.fxml
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Main.fxml"));
-        Scene scene = new Scene(loader.load(), 420, 220);
+        Scene scene = new Scene(loader.load(), 500, 500);
 
         // Laster CSS fra /resources/css/style.css
         scene.getStylesheets().add(getClass().getResource("/css/style.css").toExternalForm());
