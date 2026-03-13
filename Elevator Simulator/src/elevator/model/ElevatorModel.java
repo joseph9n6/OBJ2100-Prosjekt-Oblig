@@ -48,26 +48,27 @@ public class ElevatorModel {
     public synchronized void step() {
         Integer target = queue.peekFirst();
 
-        // Ingen target
+        // Ingen target i kø -> heisen er idle, men ikke hvis døra står åpen
         if (target == null) {
-            // Ikke overstyr DOOR_OPEN til IDLE
             if (state != ElevatorState.DOOR_OPEN) {
                 state = ElevatorState.IDLE;
             }
             return;
         }
 
-        // Regel: ikke beveg hvis dør er åpen
-        if (state == ElevatorState.DOOR_OPEN) return;
+        // Heisen kan ikke bevege seg når døra er åpen
+        if (state == ElevatorState.DOOR_OPEN) {
+            return;
+        }
 
-        // Hvis vi er fremme -> åpne dør og fjern request
+        // Hvis heisen allerede er framme, åpne døra og fjern request
         if (target == currentFloor) {
             queue.removeFirst();
             state = ElevatorState.DOOR_OPEN;
             return;
         }
 
-        // Flytt én etasje mot target
+        // Flytt én etasje mot målet
         if (target > currentFloor) {
             state = ElevatorState.MOVING_UP;
             currentFloor++;
@@ -75,13 +76,12 @@ public class ElevatorModel {
             state = ElevatorState.MOVING_DOWN;
             currentFloor--;
         }
-
-        // Etter flytt: dør lukket
-        state = ElevatorState.DOOR_CLOSED;
     }
 
     public synchronized void closeDoor() {
-        if (state == ElevatorState.DOOR_OPEN) state = ElevatorState.DOOR_CLOSED;
+        if (state == ElevatorState.DOOR_OPEN) {
+            state = queue.isEmpty() ? ElevatorState.IDLE : ElevatorState.DOOR_CLOSED;
+        }
     }
 
     public synchronized boolean isMoving() {
@@ -94,5 +94,9 @@ public class ElevatorModel {
 
     public synchronized ElevatorState getState() {
         return state;
+    }
+
+    public synchronized boolean isDoorOpen() {
+        return state == ElevatorState.DOOR_OPEN;
     }
 }
