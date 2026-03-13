@@ -1,0 +1,143 @@
+# README – Person 1 (modell og state machine)
+
+## Hva denne delen av prosjektet dekker
+
+Denne delen av prosjektet gjelder **person 1** i gruppeoppgaven. Ansvaret her er å lage den logiske kjernen i heissimulatoren, altså modellen som holder styr på heisens tilstand og regler.
+
+Denne delen omfatter:
+
+* `ElevatorState`
+* `ElevatorModel`
+* `ElevatorSnapshot`
+* enkel test med `ModelTestMain`
+
+Denne delen omfatter **ikke**:
+
+* JavaFX-visning
+* FXML-layout
+* controller-logikk
+* animasjon
+* README for hele gruppeprosjektet
+
+## Filer som hører til person 1
+
+### `src/elevator/model/ElevatorState.java`
+
+Denne filen definerer hvilke tilstander heisen kan være i:
+
+* `IDLE`
+* `MOVING_UP`
+* `MOVING_DOWN`
+* `DOOR_OPEN`
+* `DOOR_CLOSED`
+
+Hensikten er at heisen alltid skal være i **én tydelig tilstand**.
+
+### `src/elevator/model/ElevatorSnapshot.java`
+
+Denne filen er en liten immutable datapakke som brukes for å lese modellens status uten å endre modellen.
+
+Den inneholder:
+
+* nåværende etasje
+* nåværende state
+* neste mål i køen
+
+Dette gjør det enkelt for testkode og GUI å hente ut status på en trygg måte.
+
+### `src/elevator/model/ElevatorModel.java`
+
+Dette er kjernen i person 1-delen. Denne modellen eier sannheten om heisen.
+
+Modellen holder styr på:
+
+* minste etasje
+* høyeste etasje
+* nåværende etasje
+* state
+* kø av etasjeforespørsler
+
+Viktige metoder:
+
+#### `requestFloor(int floor)`
+
+Legger til en etasje i køen dersom:
+
+* etasjen er gyldig
+* etasjen ikke allerede ligger i køen
+* etasjen ikke er samme etasje som heisen står i
+
+Hvis brukeren ber om samme etasje som heisen står i, og heisen ikke beveger seg, kan døren åpnes.
+
+#### `step()`
+
+Denne metoden representerer ett "tick" i simuleringen.
+
+Den gjør følgende:
+
+* hvis køen er tom, settes heisen til `IDLE`
+* hvis døren er åpen, beveger ikke heisen seg
+* hvis heisen har nådd måletasjen, fjernes denne fra køen og døren åpnes
+* ellers flytter heisen seg én etasje mot målet
+
+#### `closeDoor()`
+
+Lukker døren når heisen står i `DOOR_OPEN`.
+
+#### `snapshot()`
+
+Returnerer et `ElevatorSnapshot`-objekt med nåværende status.
+
+#### `isMoving()` og `isDoorOpen()`
+
+Hjelpemetoder som brukes i test og logikk.
+
+### `src/elevator/model/ModelTestMain.java`
+
+Denne filen brukes bare for å teste modellen uten GUI.
+
+Testen viser at modellen kan:
+
+* motta flere etasjeforespørsler
+* ignorere duplikater
+* bevege seg mellom etasjer
+* åpne dør ved ankomst
+* lukke dør og fortsette videre
+* ende i `IDLE` når køen er tom
+
+## Regler modellen håndhever
+
+Denne delen av prosjektet bygger på noen faste regler:
+
+1. Heisen kan ikke bevege seg når døra er åpen.
+2. Døra kan ikke åpnes når heisen beveger seg.
+3. Heisen er alltid i én tydelig tilstand.
+
+Disse reglene håndheves i modellen, ikke i GUI-et.
+
+## Hvorfor dette passer inn i obligen
+
+Obligen beskriver at person 1 skal levere modell + state machine som fungerer uten UI. Det er akkurat det denne delen gjør.
+
+Målet er at andre i gruppa skal kunne bygge videre på modellen slik:
+
+* controller sender `requestFloor(...)`
+* en loop eller timeline kaller `step()`
+* GUI leser status med `snapshot()`
+* dørlogikk kan bruke `closeDoor()`
+
+På den måten blir modellen grunnlaget for resten av løsningen.
+
+## Hva som er ferdig i person 1-delen
+
+Person 1-delen regnes som ferdig når:
+
+* modellen kompilerer
+* testen kjører
+* state og kø fungerer
+* reglene håndheves
+* andre gruppemedlemmer kan koble GUI og animasjon til modellen
+
+## Kort oppsummering
+
+Person 1 har laget den logiske kjernen i heissimulatoren. Denne kjernen sørger for at heisen følger reglene, håndterer bestillinger i kø og gir en tydelig tilstand som resten av gruppa kan bygge videre på.
